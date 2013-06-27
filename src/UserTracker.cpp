@@ -380,7 +380,78 @@ XnStatus UserTracker::GetLimbs(XnUserID nUserID, XnPoint3D *pLimbs,XnFloat *pCon
     return XN_STATUS_OK;
 }
 
+void UserTracker::publishTransform(XnUserID const& user, XnSkeletonJoint const& joint, std::string const& frame_id, std::string const& child_frame_id)
+{
+	static tf::TransformBroadcaster br;
 
+    XnSkeletonJointPosition joint_position;
+    m_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, joint, joint_position);
+    double x = joint_position.position.X / 1000.0;
+    double y = joint_position.position.Y / 1000.0;
+    double z = joint_position.position.Z / 1000.0;
+
+    XnSkeletonJointOrientation joint_orientation;
+    m_UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, joint, joint_orientation);
+
+    XnFloat* m = joint_orientation.orientation.elements;
+    KDL::Rotation rotation(m[0], m[1], m[2],
+    					   m[3], m[4], m[5],
+    					   m[6], m[7], m[8]);
+    double qx, qy, qz, qw;
+    rotation.GetQuaternion(qx, qy, qz, qw);
+
+    char child_frame_no[128];
+    snprintf(child_frame_no, sizeof(child_frame_no), "%s_%d", child_frame_id.c_str(), user);
+    
+    tf::Transform transform;
+    transform.setOrigin(tf::Vector3(x, y, z));
+    transform.setRotation(tf::Quaternion(qx, -qy, -qz, qw));
+
+    // #4994
+    tf::Transform change_frame;
+    change_frame.setOrigin(tf::Vector3(0, 0, 0));
+    tf::Quaternion frame_rotation;
+    frame_rotation.setEulerZYX(1.5708, 0, 1.5708);
+    change_frame.setRotation(frame_rotation);
+
+    transform = change_frame * transform;
+
+    br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), frame_id, child_frame_no));
+}
+
+void UserTracker::publishTransforms(const std::string& frame_id)
+{
+    XnUserID users[15];
+    XnUInt16 users_count = 15;
+    m_UserGenerator.GetUsers(users, users_count);
+
+    for (int i = 0; i < users_count; ++i) {
+        XnUserID user = users[i];
+        if (!m_UserGenerator.GetSkeletonCap().IsTracking(user))
+            continue;
+
+
+        publishTransform(user, XN_SKEL_HEAD,           frame_id, "head");
+        publishTransform(user, XN_SKEL_NECK,           frame_id, "neck");
+        publishTransform(user, XN_SKEL_TORSO,          frame_id, "torso");
+
+        publishTransform(user, XN_SKEL_LEFT_SHOULDER,  frame_id, "left_shoulder");
+        publishTransform(user, XN_SKEL_LEFT_ELBOW,     frame_id, "left_elbow");
+        publishTransform(user, XN_SKEL_LEFT_HAND,      frame_id, "left_hand");
+
+        publishTransform(user, XN_SKEL_RIGHT_SHOULDER, frame_id, "right_shoulder");
+        publishTransform(user, XN_SKEL_RIGHT_ELBOW,    frame_id, "right_elbow");
+        publishTransform(user, XN_SKEL_RIGHT_HAND,     frame_id, "right_hand");
+
+        publishTransform(user, XN_SKEL_LEFT_HIP,       frame_id, "left_hip");
+        publishTransform(user, XN_SKEL_LEFT_KNEE,      frame_id, "left_knee");
+        publishTransform(user, XN_SKEL_LEFT_FOOT,      frame_id, "left_foot");
+
+        publishTransform(user, XN_SKEL_RIGHT_HIP,      frame_id, "right_hip");
+        publishTransform(user, XN_SKEL_RIGHT_KNEE,     frame_id, "right_knee");
+        publishTransform(user, XN_SKEL_RIGHT_FOOT,     frame_id, "right_foot");
+    }
+}
 
 UserTracker::~UserTracker()
 {
@@ -408,6 +479,9 @@ void UserTracker::UpdateFrame()
 {
     // Read next available data
     m_Context.WaitOneUpdateAll(m_UserGenerator);
+    //ariandy
+    publishTransforms("openni_depth_frame");
+    ros::spinOnce();
     m_pUserSelector->UpdateFrame();
     // now we need to update the users for tracking the exit pose.
 }

@@ -152,7 +152,12 @@ public:
     ///                all.
     XnFloat GetExitPoseState(XnUserID nUserId);
     /// @}
-
+	
+	
+	//ariandy
+	/// @brief ROS' joints information publishing
+	void publishTransform(XnUserID const& user, XnSkeletonJoint const& joint, std::string const& frame_id, std::string const& child_frame_id);
+	void publishTransforms(const std::string& frame_id);
 protected:
     /// @brief Internal method calculate the cumulative histogram. 
     /// 

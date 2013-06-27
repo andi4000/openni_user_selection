@@ -129,6 +129,8 @@ XnStatus UserSelector::AddNewUser(XnUserID nUserId)
     {
         return XN_STATUS_ERROR;
     }
+	printf("DEBUG: User_%d enters the scene\n", nUserId);
+
     m_hUsersState.Set(nUserId,pState); // the initial state is created in the CreateUserSelectionState
     return XN_STATUS_OK;
 }
@@ -141,6 +143,9 @@ XnStatus UserSelector::RemoveUser(XnUserID nUserId)
         return XN_STATUS_ERROR;
     }
     XN_DELETE(pState);
+    
+	printf("DEBUG: User_%d left the scene\n", nUserId);
+
     return m_hUsersState.Remove(nUserId);
 }
 
@@ -200,7 +205,7 @@ XnStatus UserSelector::TranslateStateToLabel(const UserSelectionState* pUserStat
     switch(pUserState->m_eState)
     {
     case XN_SELECTION_UNSELECTED:
-        xnOSStrCopy(strLabel,"Not selected",maxStrLen);
+        xnOSStrCopy(strLabel,"Not Selected",maxStrLen);
         return XN_STATUS_OK;
     case XN_SELECTION_SELECTED:
         xnOSStrCopy(strLabel,"Selected [",maxStrLen);

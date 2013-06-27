@@ -126,9 +126,12 @@ XnStatus DefaultTrackingInitializer::CalibrationComplete(XnUserID nUserId,XnCali
     XnBool retVal=FALSE;
     if (eStatus == XN_CALIBRATION_STATUS_OK)
     {
+
         // we start the actual tracking!
         if(m_pUserGenerator->GetSkeletonCap().StartTracking(nUserId)==XN_STATUS_OK) 
         {
+			printf("DEBUG: User_%d is calibrated\n", nUserId);
+
             retVal=TRUE;
         }
         
@@ -137,6 +140,7 @@ XnStatus DefaultTrackingInitializer::CalibrationComplete(XnUserID nUserId,XnCali
     {
         return m_pUserSelector->UpdateUserTracking(nUserId,retVal,eStatus);
     }
+    
     return XN_STATUS_OK;
 }
 
@@ -155,12 +159,14 @@ void XN_CALLBACK_TYPE DefaultTrackingInitializer::CalibrationStartCallback(xn::S
 {
     DefaultTrackingInitializer *pDefaultTrackingInitializer=(DefaultTrackingInitializer *)pCookie;
     pDefaultTrackingInitializer->CalibrationStart(nUserId);
+    
 }
 
 void XN_CALLBACK_TYPE DefaultTrackingInitializer::CalibrationCompleteCallback(xn::SkeletonCapability& /*capability*/, XnUserID nUserId, XnCalibrationStatus eStatus, void* pCookie)
 {
     DefaultTrackingInitializer *pDefaultTrackingInitializer=(DefaultTrackingInitializer *)pCookie;
     pDefaultTrackingInitializer->CalibrationComplete(nUserId,eStatus);
+    
 }
 
 void XN_CALLBACK_TYPE DefaultTrackingInitializer::CalibrationInProgressCallback(xn::SkeletonCapability& /*capability*/, XnUserID nUserId, XnCalibrationStatus eStatus, void* pCookie)

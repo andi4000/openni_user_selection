@@ -154,6 +154,8 @@ XnStatus PoseUserSelector::UpdatePoseProgress(XnUserID nUserId, XnPoseDetectionS
 
 XnStatus PoseUserSelector::DetectPose(XnUserID nUserId)
 {
+	printf("DEBUG: User_%d is detected doing a pose\n", nUserId);
+
     return StartTracking(nUserId);
 }
 
