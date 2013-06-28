@@ -76,10 +76,16 @@ XnStatus SampleManager::StartSample(int argc, char **argv)
     }
     // start the actual running (handled by the scene drawer).
     // note pUserTracker is deleted inside DrawScene when quitting.
-    SceneDrawer *singleton=SceneDrawer::GetInstance();
+    //ariandy
+    //SceneDrawer *singleton=SceneDrawer::GetInstance();
     // This starts the actual program. NOTE: the DrawScene method never ends except for
     // using the exit call to end the program. 
-    singleton->DrawScene(m_pUserTracker,argc,argv,this, bShowLowConfidence);
+    //singleton->DrawScene(m_pUserTracker,argc,argv,this, bShowLowConfidence);
+    printf("DEBUG: starting program\n");
+    while(1){
+		m_pUserTracker->UpdateFrame();
+	}
+    
     return XN_STATUS_OK; 
 }
 
