@@ -401,7 +401,8 @@ void UserTracker::publishTransform(XnUserID const& user, XnSkeletonJoint const& 
     rotation.GetQuaternion(qx, qy, qz, qw);
 
     char child_frame_no[128];
-    snprintf(child_frame_no, sizeof(child_frame_no), "%s_%d", child_frame_id.c_str(), user);
+    //snprintf(child_frame_no, sizeof(child_frame_no), "%s_%d", child_frame_id.c_str(), user);
+    snprintf(child_frame_no, sizeof(child_frame_no), "%s_%d", child_frame_id.c_str(), 1);
     
     tf::Transform transform;
     transform.setOrigin(tf::Vector3(x, y, z));
@@ -482,6 +483,10 @@ void UserTracker::UpdateFrame()
     //ariandy
     publishTransforms("openni_depth_frame");
     ros::spinOnce();
+    if (GetExitPoseState(0) >= 1.0f){
+		printf("DEBUG: exit pose completed\n");
+	}
+		
     m_pUserSelector->UpdateFrame();
     // now we need to update the users for tracking the exit pose.
 }

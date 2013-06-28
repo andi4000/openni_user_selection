@@ -344,6 +344,7 @@ void SceneDrawer::glutDisplay (void)
         singleton->m_pUserTrackerObj->UpdateFrame();
     if(singleton->m_pUserTrackerObj->GetExitPoseState(0)>=1.0f)
     {
+        //ariandy
         singleton->ExitSample(EXIT_SUCCESS);
     }
     // Process the data
