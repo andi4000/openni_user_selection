@@ -86,7 +86,7 @@ XnStatus SampleManager::StartSample(int argc, char **argv)
 		m_pUserTracker->UpdateFrame();
 	}
     
-    return XN_STATUS_OK; 
+    return !XN_STATUS_OK; 
 }
 
 void SampleManager::Cleanup()
